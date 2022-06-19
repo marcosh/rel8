@@ -16,11 +16,12 @@
 module Rel8.Schema.HTable
   ( HTable (HField, HConstrainTable)
   , hfield, htabulate, htraverse, hdicts, hspecs
-  , hmap, htabulateA
+  , hfoldMap, hmap, htabulateA
   )
 where
 
 -- base
+import Data.Functor.Const ( Const( Const ), getConst )
 import Data.Kind ( Constraint, Type )
 import Data.Functor.Compose ( Compose( Compose ), getCompose )
 import Data.Proxy ( Proxy )
@@ -112,6 +113,11 @@ class HTable t where
   {-# INLINABLE htraverse #-}
   {-# INLINABLE hdicts #-}
   {-# INLINABLE hspecs #-}
+
+
+hfoldMap :: (HTable t, Semigroup s)
+  => (forall a. context a -> s) -> t context -> s
+hfoldMap f a = getConst $ htraverse (Const . f) a
 
 
 hmap :: HTable t
